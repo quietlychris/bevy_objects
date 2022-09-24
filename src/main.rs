@@ -59,12 +59,11 @@ fn use_my_assets(
     // println!("{:?}",assets.object);
     //dbg!(&assets.img);
     // Add a camera so we can see the debug-render.
-    
+
     commands.spawn_bundle(Camera3dBundle {
         transform: Transform::from_xyz(5.5, 0.5, 1.5).looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
     });
-    
 
     const HALF_SIZE: f32 = 1.0;
     commands.spawn_bundle(DirectionalLightBundle {
@@ -118,13 +117,12 @@ fn use_my_assets(
     commands
         .spawn_bundle(cube)
         .insert(Object)
-        .insert(Collider::cuboid(1.5, 0., 1.5))
-        .insert(Friction::coefficient(1.0))
-        .insert(Restitution::coefficient(0.0))
-        // .insert(Collider::from_bevy_mesh(rectangle_mesh, &trimesh).unwrap())
+        // .insert(Collider::cuboid(1.5, 0., 1.5))
+        .insert(Friction::coefficient(0.9))
+        .insert(Restitution::coefficient(0.1))
+        .insert(Collider::from_bevy_mesh(rectangle_mesh, &trimesh).unwrap())
         .insert_bundle(TransformBundle::from(Transform::from_xyz(0.0, 0., 0.0)));
 
-    // dbg!(assets);
     let obj = assets_gltf.get(&assets.object).unwrap();
     dbg!(&obj);
 
@@ -154,12 +152,11 @@ fn use_my_assets(
                 z: 0.0,
             },
             rotation: Quat::from_euler(EulerRot::XYZ, 45.0, 45.0, 0.0),
-            scale: Vec3::new(obj_scale, obj_scale, obj_scale)
+            scale: Vec3::new(obj_scale, obj_scale, obj_scale),
         },
         ..Default::default()
     };
 
-    
     let scene = SceneBundle {
         //scene: assets_scenes.get(&obj.scenes[0]).unwrap(),
         scene: obj.scenes[0].clone(),
@@ -171,11 +168,10 @@ fn use_my_assets(
                 z: 0.0,
             },
             rotation: Quat::from_euler(EulerRot::XYZ, 45.0, 45.0, 0.0),
-            scale: Vec3::new(obj_scale, obj_scale, obj_scale)
+            scale: Vec3::new(obj_scale, obj_scale, obj_scale),
         },
         ..default()
     };
-    
 
     commands
         .spawn_bundle(scene)
