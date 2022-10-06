@@ -37,9 +37,6 @@ fn main() {
             color: Color::WHITE,
             brightness: 1.0 / 5.0f32,
         })
-        // .add_startup_system(load_gltf)
-        // .add_startup_system(use_my_assets)
-        // .add_startup_system(spawn_gltf_objects)
         .add_system(print_obj_altitude)
         .add_system(animate_light_direction)
         .add_system(bevy::window::close_on_esc)
@@ -121,24 +118,27 @@ fn use_my_assets(
     commands
         .spawn_bundle(cube)
         .insert(Object)
-        .insert(Friction::coefficient(0.9))
-        .insert(Restitution::coefficient(0.))
         .insert(Collider::from_bevy_mesh(rectangle_mesh, &trimesh).unwrap())
         .insert_bundle(TransformBundle::from(Transform::from_xyz(0.0, 0., 0.0)));
+    /*
+    .insert(Friction::coefficient(0.9))
+    .insert(Restitution::coefficient(0.))
+    */
 
     let obj = assets_gltf.get(&assets.object).unwrap();
     dbg!(&obj);
 
+    let obj_scale = 2.0;
     let scene = SceneBundle {
         scene: obj.default_scene.clone().unwrap(),
         transform: Transform {
             translation: Vec3 {
                 x: 0.0,
-                y: 1.0,
+                y: 1.5,
                 z: 0.0,
             },
-            rotation: Quat::from_euler(EulerRot::XYZ, 45.0, -45.0, 0.0),
-            ..Default::default() // scale: Vec3::new(obj_scale, obj_scale, obj_scale),
+            rotation: Quat::from_euler(EulerRot::XYZ, -90.0, 0.0, 0.0),
+            scale: Vec3::new(obj_scale, obj_scale, obj_scale),
         },
         ..default()
     };
@@ -150,21 +150,27 @@ fn use_my_assets(
         .insert(Object)
         .insert(RigidBody::Dynamic)
         .with_children(|children| {
+            let tb = TransformBundle::from_transform(Transform {
+                ..Default::default()
+            });
+
             for i in 0..gltf_mesh.primitives.len() {
                 let mesh_handle_object = gltf_mesh.primitives[i].mesh.clone();
                 let mesh = assets_mesh.get(&mesh_handle_object).unwrap();
                 let collider = Collider::from_bevy_mesh(mesh, &trimesh).unwrap();
-                children.spawn().insert(collider);
+                children.spawn_bundle(tb.clone()).insert(collider);
             }
-        })
-        .insert(Damping {
-            linear_damping: 0.5,
-            angular_damping: 0.5,
-        })
-        .insert(GravityScale(1.0))
-        .insert(Friction::coefficient(10.0))
-        .insert(Restitution::coefficient(0.1))
-        .insert(ColliderMassProperties::Density(1000.0));
+        });
+    /*
+    .insert(Damping {
+        linear_damping: 0.5,
+        angular_damping: 0.5,
+    })
+    .insert(GravityScale(1.0))
+    .insert(Friction::coefficient(10.0))
+    .insert(Restitution::coefficient(0.1))
+    .insert(ColliderMassProperties::Density(1000.0));
+    */
 }
 
 fn print_obj_altitude(positions: Query<&Transform, With<RigidBody>>) {
